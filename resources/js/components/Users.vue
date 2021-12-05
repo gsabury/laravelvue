@@ -25,7 +25,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Type</th>
-                        <th>Registered At</th>
+                        <th>Registered At</th>  
                         <th>Modify</th>
                     </tr>
                   </thead>
