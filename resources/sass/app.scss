@@ -11,3 +11,8 @@
 @import "~@fortawesome/fontawesome-free/scss/solid.scss";
 @import "~@fortawesome/fontawesome-free/scss/brands.scss";
 
+.router-link-active{
+    background-color: #5b62b7 !important;
+    color: #fff !important;
+}
+
