@@ -12,7 +12,7 @@
                         data-toggle="modal" 
                         data-target="#addNew">
                             <i class="fas fa-user-plus"></i>
-                            Add New
+                            Add New User
                     </button>
                 </div>
               </div>

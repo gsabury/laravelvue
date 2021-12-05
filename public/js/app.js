@@ -63237,7 +63237,7 @@ var staticRenderFns = [
           },
           [
             _c("i", { staticClass: "fas fa-user-plus" }),
-            _vm._v("\n                        Add New\n                "),
+            _vm._v("\n                        Add New User\n                "),
           ]
         ),
       ]),
