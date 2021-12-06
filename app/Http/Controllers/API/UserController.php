@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use DB;
 
 class UserController extends Controller
 {
@@ -65,7 +66,24 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $this->validate($request, [
+            'name' => 'required|string|max:191',
+            'email' => 'required|string|email|max:191|unique:users,email, '.$user->id.'',
+            'password' => 'string|min:6'
+        ]);
+
+        // try{
+        //     DB::beginTransaction();  
+                $user->update($request->all());
+        //     DB::commit();
+        //     return 1;
+        // }catch(\Exception $e){
+        //     DB::rollback();
+        //     return 0;
+        // }
+
+        return ['message' => 'Updated the user info'];
     }
 
     /**
@@ -76,6 +94,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+        return ['message'=> 'User Deleted Successfully'];
     }
 }
