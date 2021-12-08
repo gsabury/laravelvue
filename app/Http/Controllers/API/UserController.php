@@ -8,9 +8,22 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Image;
 
 class UserController extends Controller
 {
+
+     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -97,5 +110,52 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return ['message'=> 'User Deleted Successfully'];
+    }
+
+    public function profile(){
+        return auth('api')->user();
+    }
+
+    public function updateProfile(Request $request){
+        
+        $user = auth('api')->user();
+
+        if(!empty($request->password)){
+            $this->validate($request,[
+                'name' => 'required|string|max:191',
+                'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
+                'password' => 'sometimes|required|min:6'
+            ]);
+        }else{
+            $this->validate($request,[
+                'name' => 'required|string|max:191',
+                'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
+            ]);
+        }
+
+        
+
+        $currentPhoto = $user->photo;
+
+        if($request->photo != $currentPhoto){
+            $ext = explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
+            $name = time().'.'.$ext;
+            Image::make($request->photo)->save(public_path('img/profile/').$name);
+            $request->merge(['photo' => $name]);
+
+            $userPhoto = public_path("img/profile").'/'.$currentPhoto;
+            if(file_exists($userPhoto)){
+                @unlink($userPhoto);
+            }
+        }
+
+        if($request->password!=""){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }else{
+            $request->request->remove('password');
+        }
+        
+        $user->update($request->all());
+
     }
 }
