@@ -31,7 +31,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::latest()->paginate(5);
+        $this->authorize('isAdmin');
+        return User::latest()->paginate(20);
     }
 
     /**
@@ -86,17 +87,23 @@ class UserController extends Controller
             'password' => 'string|min:6'
         ]);
 
-        // try{
-        //     DB::beginTransaction();  
-                $user->update($request->all());
-        //     DB::commit();
-        //     return 1;
-        // }catch(\Exception $e){
-        //     DB::rollback();
-        //     return 0;
-        // }
+        if($request->password!=""){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }else{
+            $request->request->remove('password');
+        }
 
-        return ['message' => 'Updated the user info'];
+        try{
+            DB::beginTransaction();  
+                $user->update($request->all());
+            DB::commit();
+            return 1;
+        }catch(\Exception $e){
+            DB::rollback();
+            return 0;
+        }
+
+        // return ['message' => 'Updated the user info'];
     }
 
     /**
@@ -106,7 +113,8 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    {   
+        $this->authorize('isAdmin');
         $user = User::findOrFail($id);
         $user->delete();
         return ['message'=> 'User Deleted Successfully'];
@@ -144,7 +152,7 @@ class UserController extends Controller
             $request->merge(['photo' => $name]);
 
             $userPhoto = public_path("img/profile").'/'.$currentPhoto;
-            if(file_exists($userPhoto)){
+            if(file_exists($userPhoto) && $userPhoto!= public_path("img/profile/profile.png")){
                 @unlink($userPhoto);
             }
         }

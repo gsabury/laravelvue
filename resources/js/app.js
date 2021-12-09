@@ -35,17 +35,21 @@ const Toast = Swal.mixin({
 })
 window.Toast = Toast;
 
-import Form from 'vform'
+import Form from 'vform';
 
 
 window.Form = Form;
 
 window.Fire = new Vue();
 
+import Gate from "./Gate";
+Vue.prototype.$gate = new Gate(window.user);
+
 let routes = [
     { path: '/dashboard', component: require('./components/Dashboard.vue').default},
     { path: '/profile', component: require('./components/Profile.vue').default},
-    { path: '/users', component: require('./components/Users.vue').default}
+    { path: '/users', component: require('./components/Users.vue').default},
+    {path:'*', component: require('./components/NotFound.vue').default}
   ]
 
   const router = new VueRouter({
@@ -61,6 +65,7 @@ let routes = [
       return moment(created).format('MMMM Do YYYY');
   });
 
+  Vue.component('not-found', require('./components/NotFound.vue').default);
 
 /**
  * The following block of code may be used to automatically register your
