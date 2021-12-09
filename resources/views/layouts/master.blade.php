@@ -25,19 +25,26 @@
       <!-- Navbar Search -->
       <li class="nav-item">
         <div class="navbar-search-block">
-          <form class="form-inline">
+         
             <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <input 
+                    class="form-control form-control-navbar" 
+                    type="search" 
+                    placeholder="Search" 
+                    aria-label="Search"
+                    @keyup="searchUser"
+                    v-model="search">
               <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
+                <button 
+                      class="btn btn-navbar" 
+                      type="button"  
+                      @click="searchUser">
                   <i class="fas fa-search"></i>
                 </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
+                
               </div>
             </div>
-          </form>
+         
         </div>
       </li>
     </ul>
@@ -77,7 +84,7 @@
           </li>
 
          
-          @can('isAdmin')
+          @can('isAdminOrAuthor')
           <li class="nav-item">
 
             <a href="#" class="nav-link">

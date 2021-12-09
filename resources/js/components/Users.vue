@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-       <div class="row mt-5" v-if="$gate.isAdmin()">
+       <div class="row mt-5" v-if="$gate.isAdminOrAuthor()">
           <div class="col-12">
             <div class="card">
               <div class="card-header">
@@ -15,6 +15,7 @@
               </div>
               <!-- /.card-header -->
               <div class="card-body table-responsive p-0">
+                <vue-simple-spinner size="medium" message="Loading..." v-show="loading"></vue-simple-spinner>
                 <table class="table table-hover text-nowrap">
                   <thead>
                     <tr>
@@ -44,17 +45,19 @@
                                 Delete
                             </a>
                       </td>
-                    </tr>
-                    
+                    </tr> 
                   </tbody>
                 </table>
+                <div class="card-footer">
+                    <pagination :data="users" align="center" size="small" @pagination-change-page="getUsers"></pagination>
+                </div>
               </div>
               <!-- /.card-body -->
             </div>
             <!-- /.card -->
           </div>
         </div>
-        <div v-if="!$gate.isAdmin()">
+        <div v-if="!$gate.isAdminOrAuthor()">
             <not-found></not-found>
         </div>
         <!-- Modal -->
@@ -137,6 +140,7 @@
     export default {
         data: () => {
            return {
+                loading: true,
                 editMode: false,
                 users : {},
                 form: new Form({
@@ -232,13 +236,37 @@
 
               })
         },
+        getUsers(page = 1) {
+             this.loading = true;
+			      axios.get('api/user?page=' + page)
+				      .then(response => {
+					      this.users = response.data;
+                this.loading = false;
+				      });
+	  	  },
         loadUsers(){
-            if(this.$gate.isAdmin()){
-              axios.get("api/user").then(({ data }) => (this.users = data));
-            }
+            if(this.$gate.isAdminOrAuthor()){
+                this.loading = true;
+                axios.get("api/user")
+                  .then(response  => {
+                    this.users = response.data;
+                    this.loading = false;
+            });
+          }
         },        
     },
     created() {
+            Fire.$on('searching',() => {
+                this.loading = true;
+                let query = this.$parent.search;
+                axios.get('api/search?q=' + query)
+                .then((response) => {
+                    this.users = response.data;
+                    this.loading = false;
+                })
+                .catch(() => {
+                })
+            });
             this.loadUsers();
              Fire.$on('AfterCreate',() => {
                this.loadUsers();
